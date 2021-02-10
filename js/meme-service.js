@@ -2,20 +2,21 @@
 let gNextId = 1;
 let gKeywords = { happy: 11, pet: 2 };
 let gImgs = [];
+let gSavedMemes=[];
 
 let gMeme = {
-  selectedImgId: 5,
+  selectedImgId: 0,
   selectedLineIdx: 0,
 
   lines: [
     {
-      txt: 'first line',
+      txt: '',
       size: 30,
       align: 'left',
       color: 'red',
     },
     {
-      txt: 'second line',
+      txt: '',
       size: 30,
       align: 'left',
       color: 'red',
@@ -79,6 +80,17 @@ function getImgs() {
   return gImgs;
 }
 
+function saveMeme(data){
+  gSavedMemes.push({data});
+  saveToStorage('memes', gSavedMemes );
+}
+
+// function saveMeme(){
+//   let memes = loadFromStorage('memes')
+//   if (!memes) return saveToStorage('memes', [gMeme]);
+//   memes.push(gMeme);
+//   saveToStorage('memes', memes );
+// }
 
 
 
