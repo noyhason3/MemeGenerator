@@ -17,9 +17,35 @@ let gMeme = {
   ],
 };
 
+function setMemeId(imgId){
+  gMeme.selectedImgId = imgId;
+}
+
+
+
+
+function getImg(imgId){
+  return gImgs.find(img=>{
+    return (img.id===imgId)
+  })
+}
+
+
 function getImgs() {
   return gImgs;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 function _createImg() {
   let img = { 
