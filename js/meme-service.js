@@ -13,25 +13,30 @@ let gMeme = {
       size: 30,
       align: 'left',
       color: 'red',
-      pos:50,
     },
     {
       txt: 'second line',
       size: 30,
       align: 'left',
       color: 'red',
-      pos:50,
     },
   ],
 };
 
 
+function setSelectedLineIdx(idx){
+  gMeme.selectedLineIdx=idx;
+  console.log(gMeme.selectedLineIdx);
+
+}
+
 function switchLines(){
   let firstLine = gMeme.lines[0];
   let secondLine = gMeme.lines[1];
-
-  gMeme.lines.splice(0,1,secondLine)
-  gMeme.lines.splice(1,1,firstLine)
+  gMeme.lines[0] = secondLine
+  gMeme.lines[1] = firstLine
+  // gMeme.lines.splice(0,1,secondLine)
+  // gMeme.lines.splice(1,1,firstLine)
   
   console.log(gMeme);
   
@@ -44,11 +49,13 @@ function setMemeId(imgId){
 }
 
 function setTxtPos(diff){
-  gMeme.lines[0].pos-=diff
+  let idx = gMeme.selectedLineIdx;
+  gMeme.lines[idx].pos-=diff
 }
 
 function setTxtSize(diff){
-  gMeme.lines[0].size+=diff
+  let idx = gMeme.selectedLineIdx;
+  gMeme.lines[idx].size+=diff
 }
 
 function setTxt(txt, idx){

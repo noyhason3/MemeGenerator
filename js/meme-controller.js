@@ -5,12 +5,14 @@ let gCtx;
 function onInit() {
   _createImgs(18);
   renderGallery();
-//  renderDesignPage(1);
 }
 
 function renderGallery() {
   let imgs = getImgs();
-  let strHtml = '<section class="grid-container">';
+  let strHtml = `
+  <div class="grid-header"></div>
+  <section class="grid-container">
+  `;
 
   imgs.forEach((img) => {
     strHtml += `<div class="img img-${img.id}" onclick="renderDesignPage(${img.id})"><img src="${img.url}"></div>`;
@@ -27,19 +29,21 @@ function renderDesignPage(imgId) {
 
   let img = getImg(imgId);
   let strHtml = `
-    <div class="main-design-container">
+    <div class="main-design-container flex justify">
 
     <section class="canvas-container">
-    <canvas id="meme-canvas" height="500" width="500" onclick=""><img class="img-meme" src="${img.url}"></canvas>
+    <canvas id="meme-canvas" height="551" width="541" onclick=""><img class="img-meme" src="${img.url}"></canvas>
     </section>
     
-    <section class="design-tools">
+    <section class="design-tools flex column align-center">
+
     <input type="text" id="line-1" onkeyup="onSetTxt()">
     <input type="text" id="line-2" onkeyup="onSetTxt()">
-
-    <button class="increase-txt" onclick="onChangeTxtSize(2)">+</button>
-    <button class="decrease-txt" onclick="onChangeTxtSize(-2)">-</button>
-
+    <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="/ICONS/increase-font-icon.png"></button>
+    <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="/ICONS/decrease-font-icon.png"></button>
+    <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="/ICONS/up-and-down-opposite-double-arrows-side-by-side.png
+    "></button>
+    
     <button class="txt-up" onclick="onChangeTxtPos(2)">&#8593;</button>
     <button class="txt-down" onclick="onChangeTxtPos(-2)">&#8595;</button>
     
@@ -73,24 +77,33 @@ function renderCanvas(){
     gCtx = gElCanvas.getContext('2d');
 }
 
+function onNextLine(){
+    renderCanvas();
+    onSetTxt();
+    let meme = getMeme();
+    if (meme.selectedLineIdx){
+        gCtx.rect(20,60, gElCanvas.width-50, 50);
+        gCtx.strokeStyle = 'black';
+        gCtx.stroke();
+        setSelectedLineIdx(0)
+    } else {
+        gCtx.rect(20,gElCanvas.height-100, gElCanvas.width-50, 50);
+        gCtx.strokeStyle = 'black';
+        gCtx.stroke();
+        setSelectedLineIdx(1)
+    }
+}
+
 function onChangeTxtSize(diff){
     setTxtSize(diff);
-    onSetFirstLineTxt();
+    onSetTxt();
 }
 
 function onChangeTxtPos(diff){
     setTxtPos(diff);
-    onSetFirstLineTxt();
+    onSetTxt();
 }
 
-function onSwitchLines(){
-    let meme = getMeme();
-    switchLines();
-    renderCanvas();
-    drawImg();
-    drawTxt(`${meme.lines[0].txt}`,`${meme.lines[0].size}`, gElCanvas.width/2, `${meme.lines[0].pos}` );
-    drawTxt(`${meme.lines[1].txt}`,`${meme.lines[1].size}`, gElCanvas.width/2, 400 );
-}
 
 function drawTxt(txt,size, x, y){
     gCtx.beginPath();
@@ -109,14 +122,22 @@ function drawTxt(txt,size, x, y){
 function onSetTxt(){
     renderCanvas();
     drawImg();
-    console.log('fd');
     let meme = getMeme();
     
     let txt1 = document.querySelector('#line-1').value;
     setTxt(txt1, 0);
-    drawTxt(txt1,`${meme.lines[0].size}`, gElCanvas.width/2, `${meme.lines[0].pos}` );
+    drawTxt(txt1,meme.lines[0].size, gElCanvas.width/2, 100 );
     
     let txt2 = document.querySelector('#line-2').value;
     setTxt(txt2, 1);
-    drawTxt(txt2,`${meme.lines[1].size}`, gElCanvas.width/2, 400 );
+    drawTxt(txt2,meme.lines[1].size, gElCanvas.width/2, gElCanvas.height-60 );
+}
+
+function onSwitchLines(){
+    let meme = getMeme();
+    switchLines();
+    renderCanvas();
+    drawImg();
+    drawTxt(meme.lines[0].txt,meme.lines[0].size, gElCanvas.width/2, 100 );
+    drawTxt(meme.lines[1].txt,meme.lines[1].size, gElCanvas.width/2, gElCanvas.height-50);
 }
