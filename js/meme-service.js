@@ -1,8 +1,28 @@
 'use strict';
 let gNextId = 1;
-let gKeywords = { happy: 11, pet: 2 };
+let gKeywords = {
+  1: ['dogs', 'cute', 'pet', 'pets'],
+  2: ['trump', 'man'],
+  3: ['baby', 'dog', 'sleep'],
+  4: ['cat', 'computer', 'sleep'],
+  5: ['baby', 'succeed'],
+  6: ['man'],
+  7: ['baby', 'wow'],
+  8: ['man'],
+  9: ['baby'],
+  10: ['obama', 'happy', 'smile'],
+  11: ['kiss', 'man'],
+  12: ['man'],
+  13: ['drink', 'man'],
+  14: ['man'],
+  15: ['man'],
+  16: ['man', 'funny'],
+  17: ['man'],
+  18: ['toy'],
+};
 let gImgs = [];
-let gSavedMemes=[];
+let gSearchedImgs=[];
+let gSavedMemes = [];
 
 let gMeme = {
   selectedImgId: 0,
@@ -15,9 +35,9 @@ let gMeme = {
       align: 'center',
       color: 'white',
       font: 'IMPACT',
-      pos:{
-        x:250,
-        y:100,
+      pos: {
+        x: 250,
+        y: 100,
       },
       isDragging: false,
     },
@@ -27,136 +47,148 @@ let gMeme = {
       align: 'center',
       color: 'white',
       font: 'IMPACT',
-      pos:{
-        x:250,
-        y:485
+      pos: {
+        x: 250,
+        y: 485,
       },
       isDragging: false,
     },
   ],
 };
 
-function resizeLinesPos(width){
-    gMeme.lines[0].pos.x= width/2
-    gMeme.lines[0].pos.y= width/5
-    gMeme.lines[1].pos.x= width/2
-    gMeme.lines[1].pos.y= width-30
+function resizeLinesPos(width) {
+  gMeme.lines[0].pos.x = width / 2;
+  gMeme.lines[0].pos.y = width / 5;
+  gMeme.lines[1].pos.x = width / 2;
+  gMeme.lines[1].pos.y = width - 30;
 }
 
-function setSelectedLineIdx(idx){
-  gMeme.selectedLineIdx=idx;
+function setSelectedLineIdx(idx) {
+  gMeme.selectedLineIdx = idx;
   console.log(gMeme.selectedLineIdx);
-
 }
 
-function switchLines(){
-  let firstLine = gMeme.lines[0];
-  let secondLine = gMeme.lines[1];
-  gMeme.lines[0] = secondLine
-  gMeme.lines[1] = firstLine
-  // gMeme.lines.splice(0,1,secondLine)
-  // gMeme.lines.splice(1,1,firstLine)
-  
-  console.log(gMeme);
-  
-
-console.log(gMeme.lines[0]);
-}
-
-function setMemeId(imgId){
+function setMemeId(imgId) {
   gMeme.selectedImgId = imgId;
 }
 
-function setTxtPos(diff){
+function setTxtPos(diff) {
   let idx = gMeme.selectedLineIdx;
-  gMeme.lines[idx].pos-=diff
+  gMeme.lines[idx].pos -= diff;
 }
 
-function setTxtSize(diff){
+function setTxtSize(diff) {
   let idx = gMeme.selectedLineIdx;
-  gMeme.lines[idx].size+=diff
+  gMeme.lines[idx].size += diff;
 }
 
-function changeColor(color){
+function changeColor(color) {
   gMeme.lines[gMeme.selectedLineIdx].color = color;
 }
 
-function changeFont(font){
+function changeFont(font) {
   gMeme.lines[gMeme.selectedLineIdx].font = font;
 }
 
-function setAlignment(alignment, width){
-  if (alignment==='left'){
-    return gMeme.lines[gMeme.selectedLineIdx].pos.x = width/5
-  } 
-  if (alignment==='center'){
-    return gMeme.lines[gMeme.selectedLineIdx].pos.x = width/2
-  } 
-  if (alignment==='right'){
-    return gMeme.lines[gMeme.selectedLineIdx].pos.x = width/1.3
-  } 
+function setAlignment(alignment, width) {
+  if (alignment === 'left') {
+    return (gMeme.lines[gMeme.selectedLineIdx].pos.x = width / 5);
+  }
+  if (alignment === 'center') {
+    return (gMeme.lines[gMeme.selectedLineIdx].pos.x = width / 2);
+  }
+  if (alignment === 'right') {
+    return (gMeme.lines[gMeme.selectedLineIdx].pos.x = width / 1.3);
+  }
 }
 
-function setTxt(txt, idx){
-   gMeme.lines[idx].txt=txt;
+function setTxt(txt) {
+  let idx = gMeme.selectedLineIdx;
+  gMeme.lines[idx].txt = txt;
 }
 
-function getMeme(){
+function getMeme() {
   return gMeme;
 }
 
-
-
-function getImg(imgId){
-  return gImgs.find(img=>{
-    return (img.id===imgId)
-  })
+function getImg(imgId) {
+  return gImgs.find((img) => {
+    return img.id === imgId;
+  });
 }
-
 
 function getImgs() {
   return gImgs;
 }
 
-function getSavedMemes(){
+function loadSavedMemes() {
+  if (!loadFromStorage('memes')) return [];
+  gSavedMemes = loadFromStorage('memes');
+}
+
+function getSavedMemes() {
   return loadFromStorage('memes');
 }
 
-function saveMeme(data){
-  gSavedMemes.push({data});
-  saveToStorage('memes', gSavedMemes );
+function saveMeme(data) {
+  gSavedMemes.push({ data });
+  saveToStorage('memes', gSavedMemes);
 }
 
-// function saveMeme(){
-//   let memes = loadFromStorage('memes')
-//   if (!memes) return saveToStorage('memes', [gMeme]);
-//   memes.push(gMeme);
-//   saveToStorage('memes', memes );
-// }
+function findTxtClicked(clickedPos) {
+  let lines = gMeme.lines;
 
+  return lines.find((line) => {
+    return (
+      clickedPos.x > line.pos.x - 230 &&
+      clickedPos.x < line.pos.x + 260 &&
+      clickedPos.y > line.pos.y - 40 &&
+      clickedPos.y < line.pos.y + 10
+    );
+  });
+}
 
+function findTxtDragging() {
+  let lines = gMeme.lines;
 
+  return lines.find((line) => {
+    return line.isDragging;
+  });
+}
 
+function getSearchedImgs(){
+  return gSearchedImgs;
+}
 
+function searchImgs(keyword) {
+  let searchedImgs = gImgs.filter((img) => {
+    return img.keywords.find((imgKeyword) => {
+      return imgKeyword === keyword;
+    });
+  });
+  gSearchedImgs = searchedImgs;
+}
 
+function _getSelectedLine() {
+  return gMeme.lines[gMeme.selectedLineIdx];
+}
 
-
-
-
-
+function _getSelectedLineIdx() {
+  return gMeme.selectedLineIdx;
+}
 
 function _createImg() {
-  let img = { 
-    id: gNextId, 
-    url: `imgs/${gNextId}.jpg`, 
-    keywords: ['img'] 
+  let img = {
+    id: gNextId,
+    url: `imgs/${gNextId}.jpg`,
+    keywords: gKeywords[gNextId],
   };
   gNextId++;
   return img;
 }
 
-function _createImgs(count){
-  for (let i=0; i<count; i++){
+function _createImgs(count) {
+  for (let i = 0; i < count; i++) {
     gImgs.push(_createImg());
   }
 }

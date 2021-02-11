@@ -1,16 +1,30 @@
 'use strict';
 let gElCanvas;
 let gCtx;
+let gIsSearchOn=false;
 
 function onInit() {
   _createImgs(18);
   renderGallery();
+  loadSavedMemes();
 }
 
 function renderGallery() {
-  let imgs = getImgs();
+  if (gIsSearchOn) {var imgs = getSearchedImgs()} else {var imgs = getImgs()};
   let strHtml = `
-  <div class="grid-header"></div>
+  <div class="grid-header">
+  <div class="search-bar">
+  <input list="keywords" id="keywords-search" onkeyup="onSearchImgs(this)" placeholder="SEARCH IMGS">
+  <datalist id="keywords">
+    <option value="dogs">
+    <option value="cute">
+    <option value="pet">
+    <option value="man">
+    <option value="baby">
+  </datalist>
+  </div>
+
+  </div>
   <section class="grid-container">
   `;
 
@@ -22,6 +36,7 @@ function renderGallery() {
 
   let elGrid = document.querySelector('.main-container');
   elGrid.innerHTML = strHtml;
+  gIsSearchOn = false;
 }
 
 function renderDesignPage(imgId) {
@@ -35,14 +50,14 @@ function renderDesignPage(imgId) {
     <canvas id="meme-canvas" height="551" width="541" onclick=""><img class="img-meme" src="${img.url}"></canvas>
     </section>
     
-    <section class="design-tools flex column align-center">
+    <section class="design-tools flex column justify-space-between align-center">
 
     <div class="txt-box-container">
     <input type="text" class="line line-0" onkeyup="onSetTxt()">
     </div>
 
         <section class="txt-size flex">
-        <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="ICONS/up-and-down-opposite-double-arrows-side-by-side.png"></button> 
+        <button class="lines-focus clean-btn" onclick="onFocusLine()"><img class="icon" src="ICONS/up-and-down-opposite-double-arrows-side-by-side.png"></button> 
         <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="ICONS/increase-font-icon.png"></button>
         <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="ICONS/decrease-font-icon.png"></button>
         </section>
@@ -78,9 +93,6 @@ function renderDesignPage(imgId) {
     </div>
     `;
 
-  // <button class="txt-up" onclick="onChangeTxtPos(2)">&#8593;</button>
-  // <button class="txt-down" onclick="onChangeTxtPos(-2)">&#8595;</button>
-  // <button class="lines-switch" onclick="onSwitchLines()">switch</button>
   let elDesignSection = document.querySelector('.main-container');
   elDesignSection.innerHTML = strHtml;
 
@@ -110,34 +122,33 @@ function renderCanvas() {
   gCtx = gElCanvas.getContext('2d');
 }
 
-function onNextLine() {
-  renderCanvas();
-  onSetTxt();
-  let meme = getMeme();
-  if (meme.selectedLineIdx) {
-    gCtx.rect(meme.lines[0].pos.x - 230, meme.lines[0].pos.y - 40, 490, 50);
-    setSelectedLineIdx(0);
-  } else {
-    gCtx.rect(meme.lines[1].pos.x - 230, meme.lines[1].pos.y - 40, 490, 50);
-    setSelectedLineIdx(1);
-  }
+function onFocusLine() {
+  renderAllCanvas()
+
+  let currFocusLineIdx = _getSelectedLineIdx();
+  let newFocusLineIdx = currFocusLineIdx ? 0 : 1;
+  setSelectedLineIdx(newFocusLineIdx);
+
+  let selectedLine = _getSelectedLine();
+  gCtx.rect(selectedLine.pos.x - 230, selectedLine.pos.y - 40, 490, 50);
+
   gCtx.strokeStyle = 'black';
   gCtx.stroke();
-  let strHtml = ` <input type="text" class="line line-${meme.selectedLineIdx}" onkeyup="onSetTxt()" ></input>`;
+  let strHtml = ` <input type="text" class="line line-${newFocusLineIdx}" onkeyup="onSetTxt()" ></input>`;
   document.querySelector('.txt-box-container').innerHTML = strHtml;
-  document.querySelector(`.line-${meme.selectedLineIdx}`).value = `${
-    meme.lines[meme.selectedLineIdx].txt
-  }`;
+  document.querySelector(
+    `.line-${newFocusLineIdx}`
+  ).value = `${selectedLine.txt}`;
 }
 
 function onChangeTxtSize(diff) {
   setTxtSize(diff);
-  onSetTxt();
+  renderAllCanvas();
 }
 
-function onChangeFont(ev){
+function onChangeFont(ev) {
   changeFont(ev.value);
-  onSetTxt();
+  renderAllCanvas();
 }
 
 function drawTxt(txt, size, color, font, x, y) {
@@ -154,56 +165,44 @@ function drawTxt(txt, size, color, font, x, y) {
 }
 
 function onChangeColor(ev) {
-  // var meme = getMeme();
-  // var div = meme.lines[0].color;
   changeColor(ev.value);
-  // document.querySelector('.colorpicker').addEventListener("mousemove", function (e) {
-  //       changeColor(ev.value);
-  //       onSetTxt();
-  //     });
-  onSetTxt();
+  renderAllCanvas();
 }
 
 function onSetTxt() {
-  renderCanvas();
-  drawImg();
-  let meme = getMeme();
+  let idx = _getSelectedLineIdx();
 
-  if (!meme.selectedLineIdx) {
-    let txt = document.querySelector('.line-0').value;
-    setTxt(txt, 0);
-  }
-  drawTxt(
-    meme.lines[0].txt,
-    meme.lines[0].size,
-    meme.lines[0].color,
-    meme.lines[0].font,
-    meme.lines[0].pos.x,
-    meme.lines[0].pos.y
-  );
-
-  if (meme.selectedLineIdx) {
-    let txt = document.querySelector('.line-1').value;
-    setTxt(txt, 1);
-  }
-  drawTxt(
-    meme.lines[1].txt,
-    meme.lines[1].size,
-    meme.lines[1].color,
-    meme.lines[1].font,
-    meme.lines[1].pos.x,
-    meme.lines[1].pos.y
-  );
+  let txt = document.querySelector(`.line-${idx}`).value;
+  setTxt(txt);
+  renderAllCanvas();
 }
 
-function onSetAlignment(alignment){
+function renderTxt() {
+  let meme = getMeme();
+
+  let lines = meme.lines;
+  lines.forEach((line) => {
+    drawTxt(line.txt, line.size, line.color, line.font, line.pos.x, line.pos.y);
+  });
+}
+
+function onSetAlignment(alignment) {
   setAlignment(alignment, gElCanvas.width);
-  onSetTxt();
+  renderAllCanvas();
+}
+
+function renderAllCanvas() {
+  renderCanvas();
+  drawImg();
+  renderTxt();
 }
 
 function renderSavedMemes() {
   let memesData = getSavedMemes();
-  let strHtml = `
+  if (!memesData) {
+    var strHtml = 'Sorry, there is no memes saved <br> but you can start now!';
+  } else{
+  var strHtml = `
   <div class="grid-header"></div>
   <section class="grid-container">
   `;
@@ -212,7 +211,7 @@ function renderSavedMemes() {
     strHtml += `<div class="meme"><img src="${memeData.data}"></div>`;
   });
   strHtml += '</section>';
-
+  }
   let elGrid = document.querySelector('.main-container');
   elGrid.innerHTML = strHtml;
 }
@@ -257,9 +256,7 @@ function onMove(ev) {
   line.pos.x += dx;
   line.pos.y += dy;
 
-  renderCanvas();
-  drawImg();
-  onSetTxt();
+  renderAllCanvas();
 }
 
 function onUp() {
@@ -269,14 +266,6 @@ function onUp() {
   document.body.style.cursor = 'grab';
 }
 
-function findTxtDragging() {
-  let meme = getMeme();
-  let lines = meme.lines;
-
-  return lines.find((line) => {
-    return line.isDragging;
-  });
-}
 
 function getEvPos(ev) {
   var pos = {
@@ -286,50 +275,30 @@ function getEvPos(ev) {
   return pos;
 }
 
-function findTxtClicked(clickedPos) {
-  let meme = getMeme();
-  let lines = meme.lines;
-
-  return lines.find((line) => {
-    return (
-      clickedPos.x > line.pos.x - 230 &&
-      clickedPos.x < line.pos.x + 260 &&
-      clickedPos.y > line.pos.y - 40 &&
-      clickedPos.y < line.pos.y + 10
-    );
-  });
-
-  // gCtx.rect(meme.lines[0].pos.x-230,meme.lines[0].pos.y-40, 490, 50);
-
-  // gCtx.rect(meme.lines[1].pos.x-230,meme.lines[1].pos.y-35, 490, 50);
-}
 
 function toggleMenu() {
   document.querySelector('body').classList.toggle('menu-open');
 }
 
-function onSwitchLines() {
-  let meme = getMeme();
-  switchLines();
-  renderCanvas();
-  drawImg();
-  drawTxt(
-    meme.lines[0].txt,
-    meme.lines[0].size,
-    meme.lines[0].color,
-    gElCanvas.width / 2,
-    100
-  );
-  drawTxt(
-    meme.lines[1].txt,
-    meme.lines[1].size,
-    meme.lines[1].color,
-    gElCanvas.width / 2,
-    gElCanvas.height - 50
-  );
-}
 
 function onChangeTxtPos(diff) {
   setTxtPos(diff);
-  onSetTxt();
+  renderAllCanvas();
+}
+
+function toggleActive(el){
+  
+    let els = document.querySelectorAll('.nav-bar a')
+    els.forEach(el=>{
+      el.classList.remove('active')
+    })
+
+  el.classList.add('active')
+
+}
+
+function onSearchImgs(ev){
+  gIsSearchOn = true;
+  searchImgs(ev.value);
+  renderGallery();
 }
