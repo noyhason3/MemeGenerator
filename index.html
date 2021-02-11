@@ -9,6 +9,7 @@
     <title>Noy's Meme Generator</title>
   </head>
   <body onload="onInit()">
+    <div class="main-screen" onclick="toggleMenu()"></div>
     <header class="main-header">
         <div class="header-container main-content flex justify-space-between align-center">
       <h1 class="logo" onclick="renderGallery()">memegen</h1>
@@ -18,6 +19,7 @@
         <li><a href="#" class="flex justify-center align-center" onclick="renderSavedMemes()">Saved</a></li>
         <li><a href="#" class="about flex justify-center align-center">About</a></li>
       </ul>
+      <button class="menu-btn clean-btn" onclick="toggleMenu()">☰</button>
       </div>
     </header>
 

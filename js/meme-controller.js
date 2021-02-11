@@ -42,13 +42,13 @@ function renderDesignPage(imgId) {
     </div>
 
         <section class="txt-dec flex">
-        <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="/ICONS/increase-font-icon.png"></button>
-        <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="/ICONS/decrease-font-icon.png"></button>
-        <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="/ICONS/up-and-down-opposite-double-arrows-side-by-side.png
+        <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="ICONS/increase-font-icon.png"></button>
+        <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="ICONS/decrease-font-icon.png"></button>
+        <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="ICONS/up-and-down-opposite-double-arrows-side-by-side.png
         "></button> 
         </section>
         <section class="memoery-tools flex">
-        <button class="btn-save clean-btn" onclick="onSaveMeme()"><img class="icon" src="/ICONS/save.png"></button>
+        <button class="btn-save clean-btn" onclick="onSaveMeme()"><img class="icon" src="ICONS/save.png"></button>
         <button class="btn-download clean-btn"><a href="#" onclick="onDownloadMeme(this)" download="my-meme"><img class="icon" src="/ICONS/download.png"></a></button>
         </section>
         
@@ -258,6 +258,11 @@ function findTxtClicked(clickedPos) {
 
   // gCtx.rect(meme.lines[1].pos.x-230,meme.lines[1].pos.y-35, 490, 50);
 }
+
+function toggleMenu(){
+  document.querySelector('body').classList.toggle('menu-open');
+}
+
 
 function onSwitchLines() {
   let meme = getMeme();
