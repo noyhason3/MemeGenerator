@@ -39,22 +39,27 @@ function renderDesignPage(imgId) {
 
     <div class="txt-box-container">
     <input type="text" class="line line-0" onkeyup="onSetTxt()">
-
     </div>
-    <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="/ICONS/increase-font-icon.png"></button>
-    <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="/ICONS/decrease-font-icon.png"></button>
-    <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="/ICONS/up-and-down-opposite-double-arrows-side-by-side.png
-    "></button>
-    <button class="save" onclick="onSaveMeme()">save</button>
-    
-    <button class="txt-up" onclick="onChangeTxtPos(2)">&#8593;</button>
-    <button class="txt-down" onclick="onChangeTxtPos(-2)">&#8595;</button>
-    
-    <button class="lines-switch" onclick="onSwitchLines()">switch</button>
-    </section>
 
+        <section class="txt-dec flex">
+        <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="/ICONS/increase-font-icon.png"></button>
+        <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="/ICONS/decrease-font-icon.png"></button>
+        <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="/ICONS/up-and-down-opposite-double-arrows-side-by-side.png
+        "></button> 
+        </section>
+        <section class="memoery-tools flex">
+        <button class="btn-save clean-btn" onclick="onSaveMeme()"><img class="icon" src="/ICONS/save.png"></button>
+        <button class="btn-download clean-btn"><a href="#" onclick="onDownloadMeme(this)" download="my-meme"><img class="icon" src="/ICONS/download.png"></a></button>
+        </section>
+        
+    </section>
+    
     </div>
     `;
+    
+    // <button class="txt-up" onclick="onChangeTxtPos(2)">&#8593;</button>
+    // <button class="txt-down" onclick="onChangeTxtPos(-2)">&#8595;</button>
+    // <button class="lines-switch" onclick="onSwitchLines()">switch</button>
   let elDesignSection = document.querySelector('.main-container');
   elDesignSection.innerHTML = strHtml;
 
@@ -74,6 +79,9 @@ function resizeCanvas() {
   const elContainer = document.querySelector('.canvas-container');
   gElCanvas.width = elContainer.offsetWidth;
   gElCanvas.height = elContainer.offsetHeight;
+  if (elContainer.offsetWidth<500){
+    resizeLinesPos(elContainer.offsetWidth);
+  }
 }
 
 function renderCanvas() {
@@ -87,15 +95,13 @@ function onNextLine() {
   let meme = getMeme();
   if (meme.selectedLineIdx) {
     gCtx.rect(meme.lines[0].pos.x - 230, meme.lines[0].pos.y - 40, 490, 50);
-    gCtx.strokeStyle = 'black';
-    gCtx.stroke();
     setSelectedLineIdx(0);
   } else {
     gCtx.rect(meme.lines[1].pos.x - 230, meme.lines[1].pos.y - 40, 490, 50);
-    gCtx.strokeStyle = 'black';
-    gCtx.stroke();
     setSelectedLineIdx(1);
   }
+  gCtx.strokeStyle = 'black';
+  gCtx.stroke();
   let strHtml = ` <input type="text" class="line line-${meme.selectedLineIdx}" onkeyup="onSetTxt()" ></input>`;
   document.querySelector('.txt-box-container').innerHTML = strHtml;
   document.querySelector(`.line-${meme.selectedLineIdx}`).value = `${
@@ -170,6 +176,12 @@ function onSaveMeme() {
   saveMeme(data);
 }
 
+function onDownloadMeme(elLink){
+  const data = gElCanvas.toDataURL();
+  elLink.href = data;
+}
+
+
 function addMouseListeners() {
   gElCanvas.addEventListener('mousedown', onDown);
   gElCanvas.addEventListener('mousemove', onMove);
@@ -182,6 +194,11 @@ function onDown(ev) {
   let line = findTxtClicked(pos);
   line.isDragging = true;
   line.pos = pos;
+  
+  gCtx.rect(line.pos.x - 230, line.pos.y - 40, 490, 50);
+  gCtx.strokeStyle = 'black';
+  gCtx.stroke();
+
   document.body.style.cursor = 'grabbing';
 }
 
@@ -191,7 +208,7 @@ function onMove(ev) {
   const pos = getEvPos(ev);
   const dx = pos.x - line.pos.x;
   const dy = pos.y - line.pos.y;
-  
+
   line.pos.x += dx
   line.pos.y += dy
   

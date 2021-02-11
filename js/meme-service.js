@@ -34,6 +34,12 @@ let gMeme = {
   ],
 };
 
+function resizeLinesPos(width){
+    gMeme.lines[0].pos.x= width/2
+    gMeme.lines[0].pos.y= width/5
+    gMeme.lines[1].pos.x= width/2
+    gMeme.lines[1].pos.y= width-30
+}
 
 function setSelectedLineIdx(idx){
   gMeme.selectedLineIdx=idx;
