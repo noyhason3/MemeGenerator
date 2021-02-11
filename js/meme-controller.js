@@ -62,6 +62,7 @@ function renderDesignPage(imgId) {
   resizeCanvas();
   drawImg();
   drawTxt();
+  addMouseListeners();
 }
 
 function drawImg() {
@@ -75,77 +76,87 @@ function resizeCanvas() {
   gElCanvas.height = elContainer.offsetHeight;
 }
 
-function renderCanvas(){
-    gElCanvas = document.getElementById('meme-canvas');
-    gCtx = gElCanvas.getContext('2d');
+function renderCanvas() {
+  gElCanvas = document.getElementById('meme-canvas');
+  gCtx = gElCanvas.getContext('2d');
 }
 
-function onNextLine(){
-    renderCanvas();
-    onSetTxt();
-    let meme = getMeme();
-    if (meme.selectedLineIdx){
-      gCtx.rect(20,60, gElCanvas.width-50, 50);
-        gCtx.strokeStyle = 'black';
-        gCtx.stroke();
-        setSelectedLineIdx(0)
-      } else {
-        gCtx.rect(20,gElCanvas.height-100, gElCanvas.width-50, 50);
-        gCtx.strokeStyle = 'black';
-        gCtx.stroke();
-        setSelectedLineIdx(1)
-      }
-      let strHtml =` <input type="text" class="line line-${meme.selectedLineIdx}" onkeyup="onSetTxt()" ></input>`;
-      document.querySelector('.txt-box-container').innerHTML = strHtml
-      document.querySelector(`.line-${meme.selectedLineIdx}`).value = `${meme.lines[meme.selectedLineIdx].txt}`
+function onNextLine() {
+  renderCanvas();
+  onSetTxt();
+  let meme = getMeme();
+  if (meme.selectedLineIdx) {
+    gCtx.rect(meme.lines[0].pos.x - 230, meme.lines[0].pos.y - 40, 490, 50);
+    gCtx.strokeStyle = 'black';
+    gCtx.stroke();
+    setSelectedLineIdx(0);
+  } else {
+    gCtx.rect(meme.lines[1].pos.x - 230, meme.lines[1].pos.y - 40, 490, 50);
+    gCtx.strokeStyle = 'black';
+    gCtx.stroke();
+    setSelectedLineIdx(1);
+  }
+  let strHtml = ` <input type="text" class="line line-${meme.selectedLineIdx}" onkeyup="onSetTxt()" ></input>`;
+  document.querySelector('.txt-box-container').innerHTML = strHtml;
+  document.querySelector(`.line-${meme.selectedLineIdx}`).value = `${
+    meme.lines[meme.selectedLineIdx].txt
+  }`;
 }
 
-function onChangeTxtSize(diff){
-    setTxtSize(diff);
-    onSetTxt();
+function onChangeTxtSize(diff) {
+  setTxtSize(diff);
+  onSetTxt();
 }
 
-
-function drawTxt(txt,size, x, y){
+function drawTxt(txt, size, x, y) {
   gCtx.beginPath();
-  
+
   gCtx.lineWidth = 2;
   gCtx.strokeStyle = 'black';
-  gCtx.fillStyle= 'white';
+  gCtx.fillStyle = 'white';
   gCtx.textAlign = 'center';
   gCtx.font = `${size}px IMPACT`;
-  
-  gCtx.fillText(txt,x,y);
-  gCtx.strokeText(txt,x,y);
+
+  gCtx.fillText(txt, x, y);
+  gCtx.strokeText(txt, x, y);
 }
 
-
-function onSetTxt(){
+function onSetTxt() {
   renderCanvas();
   drawImg();
   let meme = getMeme();
-  
+
   if (!meme.selectedLineIdx) {
     let txt = document.querySelector('.line-0').value;
     setTxt(txt, 0);
   }
-  drawTxt(meme.lines[0].txt,meme.lines[0].size, gElCanvas.width/2, 100 );
-  
+  drawTxt(
+    meme.lines[0].txt,
+    meme.lines[0].size,
+    meme.lines[0].pos.x,
+    meme.lines[0].pos.y
+  );
+
   if (meme.selectedLineIdx) {
     let txt = document.querySelector('.line-1').value;
-    setTxt(txt, 1)
+    setTxt(txt, 1);
   }
-  drawTxt(meme.lines[1].txt,meme.lines[1].size, gElCanvas.width/2, gElCanvas.height-60 );
+  drawTxt(
+    meme.lines[1].txt,
+    meme.lines[1].size,
+    meme.lines[1].pos.x,
+    meme.lines[1].pos.y
+  );
 }
 
-function renderSavedMemes(){
-  let memesData = loadFromStorage('memes');
+function renderSavedMemes() {
+  let memesData = getSavedMemes();
   let strHtml = `
   <div class="grid-header"></div>
   <section class="grid-container">
-  `  
-console.log(memesData);
-  memesData.forEach(memeData => {
+  `;
+  console.log(memesData);
+  memesData.forEach((memeData) => {
     strHtml += `<div class="meme"><img src="${memeData.data}"></div>`;
   });
   strHtml += '</section>';
@@ -154,44 +165,98 @@ console.log(memesData);
   elGrid.innerHTML = strHtml;
 }
 
-function onSaveMeme(){
+function onSaveMeme() {
   const data = gElCanvas.toDataURL();
   saveMeme(data);
 }
 
+function addMouseListeners() {
+  gElCanvas.addEventListener('mousedown', onDown);
+  gElCanvas.addEventListener('mousemove', onMove);
+  gElCanvas.addEventListener('mouseup',onUp);
+}
 
+function onDown(ev) {
+  const pos = getEvPos(ev);
+  if (!findTxtClicked(pos)) return;
+  let line = findTxtClicked(pos);
+  line.isDragging = true;
+  line.pos = pos;
+  document.body.style.cursor = 'grabbing';
+}
 
+function onMove(ev) {
+  if (!findTxtDragging()) return;
+  let line = findTxtDragging();
+  const pos = getEvPos(ev);
+  const dx = pos.x - line.pos.x;
+  const dy = pos.y - line.pos.y;
+  
+  line.pos.x += dx
+  line.pos.y += dy
+  
+  renderCanvas()
+  drawImg();
+  onSetTxt();
+}
 
+function onUp(){
+  if (!findTxtDragging()) return;
+  let line = findTxtDragging();
+  line.isDragging = false;
+  document.body.style.cursor = 'grab';
+}
 
+function findTxtDragging() {
+  let meme = getMeme();
+  let lines = meme.lines;
 
+  return lines.find((line) => {
+    return line.isDragging;
+  });
+}
 
+function getEvPos(ev) {
+  var pos = {
+    x: ev.offsetX,
+    y: ev.offsetY,
+  };
+  return pos;
+}
 
+function findTxtClicked(clickedPos) {
+  let meme = getMeme();
+  let lines = meme.lines;
 
+  return lines.find((line) => {
+    return (
+      clickedPos.x > line.pos.x - 230 &&
+      clickedPos.x < line.pos.x + 260 &&
+      clickedPos.y > line.pos.y - 40 &&
+      clickedPos.y < line.pos.y + 10
+    );
+  });
 
+  // gCtx.rect(meme.lines[0].pos.x-230,meme.lines[0].pos.y-40, 490, 50);
 
+  // gCtx.rect(meme.lines[1].pos.x-230,meme.lines[1].pos.y-35, 490, 50);
+}
 
-
-
-
-
-
-
-
-
-
-
-function onSwitchLines(){
+function onSwitchLines() {
   let meme = getMeme();
   switchLines();
   renderCanvas();
   drawImg();
-  drawTxt(meme.lines[0].txt,meme.lines[0].size, gElCanvas.width/2, 100 );
-  drawTxt(meme.lines[1].txt,meme.lines[1].size, gElCanvas.width/2, gElCanvas.height-50);
+  drawTxt(meme.lines[0].txt, meme.lines[0].size, gElCanvas.width / 2, 100);
+  drawTxt(
+    meme.lines[1].txt,
+    meme.lines[1].size,
+    gElCanvas.width / 2,
+    gElCanvas.height - 50
+  );
 }
 
-
-function onChangeTxtPos(diff){
-    setTxtPos(diff);
-    onSetTxt();
+function onChangeTxtPos(diff) {
+  setTxtPos(diff);
+  onSetTxt();
 }
-

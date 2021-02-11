@@ -14,12 +14,22 @@ let gMeme = {
       size: 30,
       align: 'left',
       color: 'red',
+      pos:{
+        x:250,
+        y:100,
+      },
+      isDragging: false,
     },
     {
       txt: '',
       size: 30,
       align: 'left',
       color: 'red',
+      pos:{
+        x:250,
+        y:485
+      },
+      isDragging: false,
     },
   ],
 };
@@ -78,6 +88,10 @@ function getImg(imgId){
 
 function getImgs() {
   return gImgs;
+}
+
+function getSavedMemes(){
+  return loadFromStorage('memes');
 }
 
 function saveMeme(data){
