@@ -12,8 +12,9 @@ let gMeme = {
     {
       txt: '',
       size: 30,
-      align: 'left',
-      color: 'red',
+      align: 'center',
+      color: 'white',
+      font: 'IMPACT',
       pos:{
         x:250,
         y:100,
@@ -23,8 +24,9 @@ let gMeme = {
     {
       txt: '',
       size: 30,
-      align: 'left',
-      color: 'red',
+      align: 'center',
+      color: 'white',
+      font: 'IMPACT',
       pos:{
         x:250,
         y:485
@@ -73,6 +75,26 @@ function setTxtPos(diff){
 function setTxtSize(diff){
   let idx = gMeme.selectedLineIdx;
   gMeme.lines[idx].size+=diff
+}
+
+function changeColor(color){
+  gMeme.lines[gMeme.selectedLineIdx].color = color;
+}
+
+function changeFont(font){
+  gMeme.lines[gMeme.selectedLineIdx].font = font;
+}
+
+function setAlignment(alignment, width){
+  if (alignment==='left'){
+    return gMeme.lines[gMeme.selectedLineIdx].pos.x = width/5
+  } 
+  if (alignment==='center'){
+    return gMeme.lines[gMeme.selectedLineIdx].pos.x = width/2
+  } 
+  if (alignment==='right'){
+    return gMeme.lines[gMeme.selectedLineIdx].pos.x = width/1.3
+  } 
 }
 
 function setTxt(txt, idx){

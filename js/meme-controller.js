@@ -41,25 +41,46 @@ function renderDesignPage(imgId) {
     <input type="text" class="line line-0" onkeyup="onSetTxt()">
     </div>
 
-        <section class="txt-dec flex">
+        <section class="txt-size flex">
+        <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="ICONS/up-and-down-opposite-double-arrows-side-by-side.png"></button> 
         <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="ICONS/increase-font-icon.png"></button>
         <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="ICONS/decrease-font-icon.png"></button>
-        <button class="lines-next clean-btn" onclick="onNextLine()"><img class="icon" src="ICONS/up-and-down-opposite-double-arrows-side-by-side.png
-        "></button> 
         </section>
-        <section class="memoery-tools flex">
+
+        <section class="txt-dec flex">
+        <button class="btn-change-color clean-btn"><input type="color" id="fill-color" name="fill-color" onchange="onChangeColor(this)"><img class="icon" src="ICONS/paint-board-and-brush.png"></button>
+        <button class="btn-change-font clean-btn">
+        <select id="change-font" onchange="onChangeFont(this)">
+        <option>Helvetica</option>
+        <option>Arial Black</option>
+        <option>Impact</option>
+        <option>Tahoma</option>
+        <option>Lucida Console</option>
+        </select>
+        font
+        </button>
+        </section>
+
+      
+        <section class="alignment-txt flex">
+        <button class="btn-left clean-btn" onclick="onSetAlignment('left')"><img class="icon" src="ICONS/align-to-left.png"></button>
+        <button class="btn-center clean-btn" onclick="onSetAlignment('center')"><img class="icon" src="ICONS/center-text-alignment.png"></button>
+        <button class="btn-right clean-btn" onclick="onSetAlignment('right')"><img class="icon" src="ICONS/align-to-right.png"></button>
+        </section>
+      
+        <section class="memory-tools flex">
         <button class="btn-save clean-btn" onclick="onSaveMeme()"><img class="icon" src="ICONS/save.png"></button>
-        <button class="btn-download clean-btn"><a href="#" onclick="onDownloadMeme(this)" download="my-meme"><img class="icon" src="/ICONS/download.png"></a></button>
+        <button class="btn-download clean-btn"><a href="#" onclick="onDownloadMeme(this)" download="my-meme"><img class="icon" src="ICONS/download.png"></a></button>
         </section>
         
     </section>
     
     </div>
     `;
-    
-    // <button class="txt-up" onclick="onChangeTxtPos(2)">&#8593;</button>
-    // <button class="txt-down" onclick="onChangeTxtPos(-2)">&#8595;</button>
-    // <button class="lines-switch" onclick="onSwitchLines()">switch</button>
+
+  // <button class="txt-up" onclick="onChangeTxtPos(2)">&#8593;</button>
+  // <button class="txt-down" onclick="onChangeTxtPos(-2)">&#8595;</button>
+  // <button class="lines-switch" onclick="onSwitchLines()">switch</button>
   let elDesignSection = document.querySelector('.main-container');
   elDesignSection.innerHTML = strHtml;
 
@@ -79,7 +100,7 @@ function resizeCanvas() {
   const elContainer = document.querySelector('.canvas-container');
   gElCanvas.width = elContainer.offsetWidth;
   gElCanvas.height = elContainer.offsetHeight;
-  if (elContainer.offsetWidth<500){
+  if (elContainer.offsetWidth < 500) {
     resizeLinesPos(elContainer.offsetWidth);
   }
 }
@@ -114,17 +135,33 @@ function onChangeTxtSize(diff) {
   onSetTxt();
 }
 
-function drawTxt(txt, size, x, y) {
+function onChangeFont(ev){
+  changeFont(ev.value);
+  onSetTxt();
+}
+
+function drawTxt(txt, size, color, font, x, y) {
   gCtx.beginPath();
 
   gCtx.lineWidth = 2;
   gCtx.strokeStyle = 'black';
-  gCtx.fillStyle = 'white';
+  gCtx.fillStyle = color;
   gCtx.textAlign = 'center';
-  gCtx.font = `${size}px IMPACT`;
+  gCtx.font = `${size}px ${font}`;
 
   gCtx.fillText(txt, x, y);
   gCtx.strokeText(txt, x, y);
+}
+
+function onChangeColor(ev) {
+  // var meme = getMeme();
+  // var div = meme.lines[0].color;
+  changeColor(ev.value);
+  // document.querySelector('.colorpicker').addEventListener("mousemove", function (e) {
+  //       changeColor(ev.value);
+  //       onSetTxt();
+  //     });
+  onSetTxt();
 }
 
 function onSetTxt() {
@@ -139,6 +176,8 @@ function onSetTxt() {
   drawTxt(
     meme.lines[0].txt,
     meme.lines[0].size,
+    meme.lines[0].color,
+    meme.lines[0].font,
     meme.lines[0].pos.x,
     meme.lines[0].pos.y
   );
@@ -150,9 +189,16 @@ function onSetTxt() {
   drawTxt(
     meme.lines[1].txt,
     meme.lines[1].size,
+    meme.lines[1].color,
+    meme.lines[1].font,
     meme.lines[1].pos.x,
     meme.lines[1].pos.y
   );
+}
+
+function onSetAlignment(alignment){
+  setAlignment(alignment, gElCanvas.width);
+  onSetTxt();
 }
 
 function renderSavedMemes() {
@@ -176,16 +222,15 @@ function onSaveMeme() {
   saveMeme(data);
 }
 
-function onDownloadMeme(elLink){
+function onDownloadMeme(elLink) {
   const data = gElCanvas.toDataURL();
   elLink.href = data;
 }
 
-
 function addMouseListeners() {
   gElCanvas.addEventListener('mousedown', onDown);
   gElCanvas.addEventListener('mousemove', onMove);
-  gElCanvas.addEventListener('mouseup',onUp);
+  gElCanvas.addEventListener('mouseup', onUp);
 }
 
 function onDown(ev) {
@@ -194,7 +239,7 @@ function onDown(ev) {
   let line = findTxtClicked(pos);
   line.isDragging = true;
   line.pos = pos;
-  
+
   gCtx.rect(line.pos.x - 230, line.pos.y - 40, 490, 50);
   gCtx.strokeStyle = 'black';
   gCtx.stroke();
@@ -209,15 +254,15 @@ function onMove(ev) {
   const dx = pos.x - line.pos.x;
   const dy = pos.y - line.pos.y;
 
-  line.pos.x += dx
-  line.pos.y += dy
-  
-  renderCanvas()
+  line.pos.x += dx;
+  line.pos.y += dy;
+
+  renderCanvas();
   drawImg();
   onSetTxt();
 }
 
-function onUp(){
+function onUp() {
   if (!findTxtDragging()) return;
   let line = findTxtDragging();
   line.isDragging = false;
@@ -259,20 +304,26 @@ function findTxtClicked(clickedPos) {
   // gCtx.rect(meme.lines[1].pos.x-230,meme.lines[1].pos.y-35, 490, 50);
 }
 
-function toggleMenu(){
+function toggleMenu() {
   document.querySelector('body').classList.toggle('menu-open');
 }
-
 
 function onSwitchLines() {
   let meme = getMeme();
   switchLines();
   renderCanvas();
   drawImg();
-  drawTxt(meme.lines[0].txt, meme.lines[0].size, gElCanvas.width / 2, 100);
+  drawTxt(
+    meme.lines[0].txt,
+    meme.lines[0].size,
+    meme.lines[0].color,
+    gElCanvas.width / 2,
+    100
+  );
   drawTxt(
     meme.lines[1].txt,
     meme.lines[1].size,
+    meme.lines[1].color,
     gElCanvas.width / 2,
     gElCanvas.height - 50
   );

@@ -114,9 +114,27 @@ canvas img {
   margin: 10px;
 }
 
+#fill-color{
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+  width: 38.9px;
+  height: 38.9px;
+}
+
+#change-font{
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+  width: 38.9px;
+  height: 38.9px;
+}
+
 footer {
   background-color: #ff7f00;
 }
+
+
 
 footer .logo {
   font-family: montserrat-bold;
