@@ -2,6 +2,7 @@
 let gElCanvas;
 let gCtx;
 let gIsSearchOn=false;
+const gTouchEvs = ['touchstart', 'touchmove', 'touchend']
 
 function onInit() {
   _createImgs(18);
@@ -101,6 +102,7 @@ function renderDesignPage(imgId) {
   drawImg();
   drawTxt();
   addMouseListeners();
+  addTouchListeners()
 }
 
 function drawImg() {
@@ -232,6 +234,14 @@ function addMouseListeners() {
   gElCanvas.addEventListener('mouseup', onUp);
 }
 
+function addTouchListeners(){
+
+  gElCanvas.addEventListener('touchstart',onDown)
+  gElCanvas.addEventListener('touchmove',onMove)
+  gElCanvas.addEventListener('touchend',onUp)
+
+}
+
 function onDown(ev) {
   const pos = getEvPos(ev);
   if (!findTxtClicked(pos)) return;
@@ -272,6 +282,14 @@ function getEvPos(ev) {
     x: ev.offsetX,
     y: ev.offsetY,
   };
+  if (gTouchEvs.includes(ev.type)) {
+    ev.preventDefault()
+    ev = ev.changedTouches[0]
+    pos = {
+        x: ev.pageX - ev.target.offsetLeft - ev.target.clientLeft,
+        y: ev.pageY - ev.target.offsetTop - ev.target.clientTop
+    }
+  }
   return pos;
 }
 
