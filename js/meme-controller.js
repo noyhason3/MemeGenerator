@@ -304,6 +304,9 @@ function onDown(ev) {
   const pos = getEvPos(ev);
   if (!findTxtClicked(pos)) return;
   let line = findTxtClicked(pos);
+  console.log(line);
+  setSelectedLineIdx(line.idx-1);
+  changeFocusLine();
   line.isDragging = true;
   line.pos = pos;
 

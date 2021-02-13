@@ -1,5 +1,6 @@
 'use strict';
 let gNextId = 1;
+let gNextIdx=1;
 let gKeywords= [];
 let gImgsKeywords = {
   1: ['pet'],
@@ -33,6 +34,7 @@ let gMeme = {
 
   lines: [
     {
+      idx:0,
       txt: '',
       size: 30,
       align: 'center',
@@ -57,6 +59,7 @@ function addLine(width, height){
     yPos=height/2
   }
   gMeme.lines.push({
+  idx: gNextIdx,
   txt: '',
   size: 30,
   align: 'center',
@@ -67,8 +70,8 @@ function addLine(width, height){
     y: yPos,
   },
   isDragging: false,})
-  // gMeme.selectedLineIdx = gMeme.linesCount;
   gMeme.linesCount++;
+  gNextIdx++;
 }
 
 function resizeLinesPos(width) {
@@ -194,7 +197,6 @@ function addKeyword(keywordObj){
 }
 
 function _getSelectedLine() {
-  console.log(gMeme);
   return gMeme.lines[gMeme.selectedLineIdx];
 }
 
