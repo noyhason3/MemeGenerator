@@ -120,9 +120,10 @@ function renderDesignPage(imgId) {
         </select>
         font
         </button>
+
         </section>
 
-      
+
         <section class="alignment-txt flex">
         <button class="btn-left clean-btn" onclick="onSetAlignment('left')"><img class="icon" src="ICONS/align-to-left.png"></button>
         <button class="btn-center clean-btn" onclick="onSetAlignment('center')"><img class="icon" src="ICONS/center-text-alignment.png"></button>
@@ -135,6 +136,18 @@ function renderDesignPage(imgId) {
         <button class="btn-clear clean-btn"><a href="#" onclick="onClearMeme()"><img class="icon" src="ICONS/clear.png"></a></button>
         </section>
         
+        <section class="inputs flex column align-center"> upload on facebook in 3-steps:
+        <div class="flex">
+        <button class="btn-upload clean-btn"><input type="file" id="upload-img" class="btn-img-input clean-btn" name="image" onchange="onImgInput(event)"/>Upload</button>
+        <form class="flex" action="" method="POST" enctype="multipart/form-data" onsubmit="uploadImg(this, event)">
+          <input name="img" id="imgData" type="hidden" />
+          <button class="publish-btn btn clean-btn " type="submit">Publish</button>
+          <button class="share-container clean-btn""><img class="icon" src="ICONS/upload.png"></button>
+        </form>
+        </div>
+        </section>
+      
+
     </section>
     
     </div>
@@ -152,6 +165,30 @@ function renderDesignPage(imgId) {
   document.querySelector('.about-me').style.display = 'none';
 }
 
+function onImgInput(ev){
+    loadImgFromInput(ev,renderImg)
+}
+
+function loadImgFromInput(ev,onImageReady){
+  document.querySelector('.share-container').innerHTML = '';
+  var reader = new FileReader();
+
+  reader.onload = function(event){
+    var img = new Image();
+    img.onload = onImageReady.bind(null,img);
+    img.src = event.target.result;
+  }
+  reader.readAsDataURL(ev.target.files[0])
+}
+
+function renderImg(img){
+  gCtx.drawImage(img,0,0,gElCanvas.width,gElCanvas.height);
+}
+
+function loadImgFromInput(){
+
+}
+
 function onDeleteLine(){
   deleteLine();
   renderAllCanvas();
@@ -167,6 +204,7 @@ function drawImg() {
   const elImg = document.querySelector('.img-meme');
   gCtx.drawImage(elImg, 0, 0, gElCanvas.width, gElCanvas.height);
 }
+
 
 function resizeCanvas() {
   const elContainer = document.querySelector('.canvas-container');
