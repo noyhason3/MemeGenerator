@@ -74,8 +74,6 @@ function emphasizeKeyword(el) {
 
   let objKeyword = getKeyWord(el.innerText);
   objKeyword.size += 3;
-  // let size = parseInt(getComputedStyle(el).getPropertyValue('font-size'));
-  // el.style.fontSize = size + 3+'px';
 
   searchImgs(el.innerText);
   gIsSearchOn = true;
@@ -117,8 +115,10 @@ function renderDesignPage(imgId) {
         <option>Impact</option>
         <option>Tahoma</option>
         <option>Lucida Console</option>
+        <option>Times New Roman</option>
         </select>
-        font
+        <img class="icon" src="ICONS/font.png">
+        </button>
         </button>
 
         </section>
@@ -142,7 +142,7 @@ function renderDesignPage(imgId) {
         <form class="flex" action="" method="POST" enctype="multipart/form-data" onsubmit="uploadImg(this, event)">
           <input name="img" id="imgData" type="hidden" />
           <button class="publish-btn btn clean-btn " type="submit">Publish</button>
-          <button class="share-container clean-btn""><img class="icon" src="ICONS/upload.png"></button>
+          <button class="share-container clean-btn" style="width:80px" ><img style="width:100%" class="icon" src="ICONS/upload.jpg"></button>
         </form>
         </div>
         </section>
@@ -185,9 +185,6 @@ function renderImg(img){
   gCtx.drawImage(img,0,0,gElCanvas.width,gElCanvas.height);
 }
 
-function loadImgFromInput(){
-
-}
 
 function onDeleteLine(){
   deleteLine();
@@ -204,7 +201,6 @@ function drawImg() {
   const elImg = document.querySelector('.img-meme');
   gCtx.drawImage(elImg, 0, 0, gElCanvas.width, gElCanvas.height);
 }
-
 
 function resizeCanvas() {
   const elContainer = document.querySelector('.canvas-container');
