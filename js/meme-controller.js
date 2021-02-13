@@ -83,6 +83,7 @@ function emphasizeKeyword(el) {
 }
 
 function renderDesignPage(imgId) {
+  clearMeme();
   setMemeId(imgId);
 
   let img = getImg(imgId);
@@ -101,6 +102,7 @@ function renderDesignPage(imgId) {
 
         <section class="txt-size flex">
         <button class="add-line clean-btn" onclick="onAddLine()"><img class="icon" src="ICONS/add.png"></button>
+        <button class="delete-line clean-btn" onclick="onDeleteLine()"><img class="icon" src="ICONS/trash.png"></button>
         <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="ICONS/increase-font-icon.png"></button>
         <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="ICONS/decrease-font-icon.png"></button>
         </section>
@@ -130,6 +132,7 @@ function renderDesignPage(imgId) {
         <section class="memory-tools flex">
         <button class="btn-save clean-btn" onclick="onSaveMeme()"><img class="icon" src="ICONS/save.png"></button>
         <button class="btn-download clean-btn"><a href="#" onclick="onDownloadMeme(this)" download="my-meme"><img class="icon" src="ICONS/download.png"></a></button>
+        <button class="btn-clear clean-btn"><a href="#" onclick="onClearMeme()"><img class="icon" src="ICONS/clear.png"></a></button>
         </section>
         
     </section>
@@ -147,6 +150,17 @@ function renderDesignPage(imgId) {
   addMouseListeners();
   addTouchListeners();
   document.querySelector('.about-me').style.display = 'none';
+}
+
+function onDeleteLine(){
+  deleteLine();
+  renderAllCanvas();
+}
+
+function onClearMeme(){
+  clearMeme();
+  renderAllCanvas();
+  changeFocusLine();
 }
 
 function drawImg() {

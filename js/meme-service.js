@@ -49,6 +49,43 @@ let gMeme = {
   ],
 };
 
+function clearMeme(){
+   gMeme = {
+    selectedImgId: 0,
+    selectedLineIdx: 0,
+    linesCount: 0,
+  
+    lines: [
+      {
+        idx:0,
+        txt: '',
+        size: 30,
+        align: 'center',
+        color: 'white',
+        font: 'IMPACT',
+        pos: {
+          x: 250,
+          y: 100,
+        },
+        isDragging: false,
+      },
+    ],
+  };
+}
+
+function deleteLine(){
+  let idx =gMeme.selectedLineIdx 
+  if (!gMeme.linesCount) return;
+  gMeme.lines.splice(idx,1);
+  gMeme.linesCount--;
+  // gMeme.lines.forEach(line=>{
+  //   if (line.idx>idx) line.idx--;
+  // })
+  if (!gMeme.selectedLineIdx) gMeme.selectedLineIdx++;
+  else gMeme.selectedLineIdx--;
+  console.log(gMeme);
+}
+
 function addLine(width, height){
   let yPos;
   if (gMeme.linesCount===0) 
