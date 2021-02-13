@@ -8,7 +8,6 @@ const gTouchEvs = ['touchstart', 'touchmove', 'touchend']
 function onInit() {
   _createImgs(18);
   renderGallery();
-  // addKeywords()
   loadSavedMemes();
 }
 
