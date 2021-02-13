@@ -1,9 +1,9 @@
 'use strict';
 let gElCanvas;
 let gCtx;
-let gIsSearchOn=false;
+let gIsSearchOn = false;
 let gIsKeywordsClicked = false;
-const gTouchEvs = ['touchstart', 'touchmove', 'touchend']
+const gTouchEvs = ['touchstart', 'touchmove', 'touchend'];
 
 function onInit() {
   _createImgs(18);
@@ -11,9 +11,12 @@ function onInit() {
   loadSavedMemes();
 }
 
-
 function renderGallery() {
-  if (gIsSearchOn) {var imgs = getSearchedImgs()} else {var imgs = getImgs()};
+  if (gIsSearchOn) {
+    var imgs = getSearchedImgs();
+  } else {
+    var imgs = getImgs();
+  }
   let strHtml = `
   <div class="grid-header">
   <div class="search-container flex justify-space-around align-center">
@@ -44,28 +47,29 @@ function renderGallery() {
   elGrid.innerHTML = strHtml;
   if (gIsKeywordsClicked === false) addKeywords();
   renderKeywords();
+  document.querySelector('.about-me').style.display = 'block';
   gIsSearchOn = false;
 }
 
-function renderKeywords(){
+function renderKeywords() {
   let strHtml = '';
   let keywords = document.querySelectorAll('#keywords option');
-  keywords.forEach(keyword=>{
+  keywords.forEach((keyword) => {
     let obj = getKeyWord(keyword.value);
-    strHtml+=`<span onclick="emphasizeKeyword(this)" style="font-size: ${obj.size}px">${keyword.value}</span>`
-  })
+    strHtml += `<span onclick="emphasizeKeyword(this)" style="font-size: ${obj.size}px">${keyword.value}</span>`;
+  });
   let keywordsDisplay = document.querySelector('.keywords-display');
   keywordsDisplay.innerHTML = strHtml;
 }
 
-function addKeywords(){
+function addKeywords() {
   let keywords = document.querySelectorAll('#keywords option');
-  keywords.forEach(keyword=>{
-    addKeyword({key : keyword.value, size: 22})
-  })
+  keywords.forEach((keyword) => {
+    addKeyword({ key: keyword.value, size: 22 });
+  });
 }
 
-function emphasizeKeyword(el){
+function emphasizeKeyword(el) {
   gIsKeywordsClicked = true;
 
   let objKeyword = getKeyWord(el.innerText);
@@ -77,7 +81,6 @@ function emphasizeKeyword(el){
   gIsSearchOn = true;
   renderGallery();
 }
-
 
 function renderDesignPage(imgId) {
   setMemeId(imgId);
@@ -93,16 +96,17 @@ function renderDesignPage(imgId) {
     <section class="design-tools flex column justify-space-between align-center">
 
     <div class="txt-box-container">
-    <input type="text" class="line line-0" onkeyup="onSetTxt()">
+    <input type="text" class="line line-0" onclick="drawFocus()" onkeyup="onSetTxt()">
     </div>
 
         <section class="txt-size flex">
-        <button class="lines-focus clean-btn" onclick="onFocusLine()"><img class="icon" src="ICONS/up-and-down-opposite-double-arrows-side-by-side.png"></button> 
+        <button class="add-line clean-btn" onclick="onAddLine()"><img class="icon" src="ICONS/add.png"></button>
         <button class="increase-txt  clean-btn" onclick="onChangeTxtSize(2)"><img class="icon" src="ICONS/increase-font-icon.png"></button>
         <button class="decrease-txt clean-btn" onclick="onChangeTxtSize(-2)"><img class="icon" src="ICONS/decrease-font-icon.png"></button>
         </section>
-
+        
         <section class="txt-dec flex">
+        <button class="lines-focus clean-btn" onclick="changeFocusLine()"><img class="icon" src="ICONS/up-and-down-opposite-double-arrows-side-by-side.png"></button> 
         <button class="btn-change-color clean-btn"><input type="color" id="fill-color" name="fill-color" onchange="onChangeColor(this)"><img class="icon" src="ICONS/paint-board-and-brush.png"></button>
         <button class="btn-change-font clean-btn">
         <select id="change-font" onchange="onChangeFont(this)">
@@ -141,7 +145,8 @@ function renderDesignPage(imgId) {
   drawImg();
   drawTxt();
   addMouseListeners();
-  addTouchListeners()
+  addTouchListeners();
+  document.querySelector('.about-me').style.display = 'none';
 }
 
 function drawImg() {
@@ -163,23 +168,37 @@ function renderCanvas() {
   gCtx = gElCanvas.getContext('2d');
 }
 
-function onFocusLine() {
-  renderAllCanvas()
-
+function changeFocusLine() {
+  renderAllCanvas();
+  let meme = getMeme();
   let currFocusLineIdx = _getSelectedLineIdx();
-  let newFocusLineIdx = currFocusLineIdx ? 0 : 1;
+  let newFocusLineIdx;
+
+  if (currFocusLineIdx === meme.linesCount) newFocusLineIdx = 0;
+   else newFocusLineIdx = currFocusLineIdx + 1;
+  
+
   setSelectedLineIdx(newFocusLineIdx);
 
   let selectedLine = _getSelectedLine();
-  gCtx.rect(selectedLine.pos.x - 230, selectedLine.pos.y - 40, 490, 50);
 
-  gCtx.strokeStyle = 'black';
-  gCtx.stroke();
+  drawFocus();
+
   let strHtml = ` <input type="text" class="line line-${newFocusLineIdx}" onkeyup="onSetTxt()" ></input>`;
   document.querySelector('.txt-box-container').innerHTML = strHtml;
   document.querySelector(
     `.line-${newFocusLineIdx}`
   ).value = `${selectedLine.txt}`;
+}
+
+function drawFocus(){
+  const elContainer = document.querySelector('.canvas-container');
+
+  let selectedLine = _getSelectedLine();
+  gCtx.rect(elContainer.offsetWidth/11 , selectedLine.pos.y - 40, elContainer.offsetWidth/1.2, 50);
+
+  gCtx.strokeStyle = 'black';
+  gCtx.stroke();
 }
 
 function onChangeTxtSize(diff) {
@@ -216,6 +235,7 @@ function onSetTxt() {
   let txt = document.querySelector(`.line-${idx}`).value;
   setTxt(txt);
   renderAllCanvas();
+  drawFocus();
 }
 
 function renderTxt() {
@@ -242,22 +262,23 @@ function renderSavedMemes() {
   let memesData = getSavedMemes();
   if (!memesData) {
     var strHtml = 'Sorry, there is no memes saved <br> but you can start now!';
-  } else{
-  var strHtml = `
+  } else {
+    var strHtml = `
   <div class="grid-header"></div>
   <section class="grid-container">
   `;
-  console.log(memesData);
-  memesData.forEach((memeData) => {
-    strHtml += `<div class="meme"><img src="${memeData.data}"></div>`;
-  });
-  strHtml += '</section>';
+    console.log(memesData);
+    memesData.forEach((memeData) => {
+      strHtml += `<div class="meme"><img src="${memeData.data}"></div>`;
+    });
+    strHtml += '</section>';
   }
   let elGrid = document.querySelector('.main-container');
   elGrid.innerHTML = strHtml;
 }
 
 function onSaveMeme() {
+  renderAllCanvas();
   const data = gElCanvas.toDataURL();
   saveMeme(data);
 }
@@ -273,12 +294,10 @@ function addMouseListeners() {
   gElCanvas.addEventListener('mouseup', onUp);
 }
 
-function addTouchListeners(){
-
-  gElCanvas.addEventListener('touchstart',onDown)
-  gElCanvas.addEventListener('touchmove',onMove)
-  gElCanvas.addEventListener('touchend',onUp)
-
+function addTouchListeners() {
+  gElCanvas.addEventListener('touchstart', onDown);
+  gElCanvas.addEventListener('touchmove', onMove);
+  gElCanvas.addEventListener('touchend', onUp);
 }
 
 function onDown(ev) {
@@ -288,9 +307,7 @@ function onDown(ev) {
   line.isDragging = true;
   line.pos = pos;
 
-  gCtx.rect(line.pos.x - 230, line.pos.y - 40, 490, 50);
-  gCtx.strokeStyle = 'black';
-  gCtx.stroke();
+  drawFocus();
 
   document.body.style.cursor = 'grabbing';
 }
@@ -306,6 +323,7 @@ function onMove(ev) {
   line.pos.y += dy;
 
   renderAllCanvas();
+  drawFocus();
 }
 
 function onUp() {
@@ -313,8 +331,8 @@ function onUp() {
   let line = findTxtDragging();
   line.isDragging = false;
   document.body.style.cursor = 'grab';
+  renderAllCanvas();
 }
-
 
 function getEvPos(ev) {
   var pos = {
@@ -322,40 +340,43 @@ function getEvPos(ev) {
     y: ev.offsetY,
   };
   if (gTouchEvs.includes(ev.type)) {
-    ev.preventDefault()
-    ev = ev.changedTouches[0]
+    ev.preventDefault();
+    ev = ev.changedTouches[0];
     pos = {
-        x: ev.pageX - ev.target.offsetLeft - ev.target.clientLeft,
-        y: ev.pageY - ev.target.offsetTop - ev.target.clientTop
-    }
+      x: ev.pageX - ev.target.offsetLeft - ev.target.clientLeft,
+      y: ev.pageY - ev.target.offsetTop - ev.target.clientTop,
+    };
   }
   return pos;
 }
 
-
 function toggleMenu() {
   document.querySelector('body').classList.toggle('menu-open');
 }
-
 
 function onChangeTxtPos(diff) {
   setTxtPos(diff);
   renderAllCanvas();
 }
 
-function toggleActive(el){
-  
-    let els = document.querySelectorAll('.nav-bar a')
-    els.forEach(el=>{
-      el.classList.remove('active')
-    })
+function toggleActive(el) {
+  let els = document.querySelectorAll('.nav-bar a');
+  els.forEach((el) => {
+    el.classList.remove('active');
+  });
 
-  el.classList.add('active')
-
+  el.classList.add('active');
 }
 
-function onSearchImgs(ev){
+function onSearchImgs(ev) {
   gIsSearchOn = true;
   searchImgs(ev.value);
   renderGallery();
+}
+
+function onAddLine() {
+  const elContainer = document.querySelector('.canvas-container');
+  addLine(elContainer.offsetWidth, elContainer.offsetHeight);
+  changeFocusLine();
+  // renderAllCanvas();
 }

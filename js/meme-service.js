@@ -29,6 +29,7 @@ let gSavedMemes = [];
 let gMeme = {
   selectedImgId: 0,
   selectedLineIdx: 0,
+  linesCount: 0,
 
   lines: [
     {
@@ -43,31 +44,42 @@ let gMeme = {
       },
       isDragging: false,
     },
-    {
-      txt: '',
-      size: 30,
-      align: 'center',
-      color: 'white',
-      font: 'IMPACT',
-      pos: {
-        x: 250,
-        y: 485,
-      },
-      isDragging: false,
-    },
   ],
 };
+
+function addLine(width, height){
+  let yPos;
+  if (gMeme.linesCount===0) 
+  {
+    yPos= width - 30;
+  }
+  else {
+    yPos=height/2
+  }
+  gMeme.lines.push({
+  txt: '',
+  size: 30,
+  align: 'center',
+  color: 'white',
+  font: 'IMPACT',
+  pos: {
+    x: width / 2,
+    y: yPos,
+  },
+  isDragging: false,})
+  // gMeme.selectedLineIdx = gMeme.linesCount;
+  gMeme.linesCount++;
+}
 
 function resizeLinesPos(width) {
   gMeme.lines[0].pos.x = width / 2;
   gMeme.lines[0].pos.y = width / 5;
-  gMeme.lines[1].pos.x = width / 2;
-  gMeme.lines[1].pos.y = width - 30;
+  // gMeme.lines[1].pos.x = width / 2;
+  // gMeme.lines[1].pos.y = width - 30;
 }
 
 function setSelectedLineIdx(idx) {
   gMeme.selectedLineIdx = idx;
-  console.log(gMeme.selectedLineIdx);
 }
 
 function setMemeId(imgId) {
@@ -182,6 +194,7 @@ function addKeyword(keywordObj){
 }
 
 function _getSelectedLine() {
+  console.log(gMeme);
   return gMeme.lines[gMeme.selectedLineIdx];
 }
 

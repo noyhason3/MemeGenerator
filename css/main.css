@@ -15,6 +15,7 @@ html {
   color: #ffffff;
   font-family: montserrat-bold;
   line-height: 1.2;
+  min-height: 1400px;
 }
 
 header .logo {
@@ -53,6 +54,7 @@ header {
   color: black;
 }
 .main-container {
+  min-height: 600px;
   margin-bottom: 27px;
   color: black;
   font-weight: bold;
@@ -65,12 +67,17 @@ header {
 .grid-header{
   background-color: rgba(255, 255, 255, 0.548);
   margin-bottom: 27px;
-  padding: 25px;
+  padding-top: 10px;
   border-radius: 12px;
+}
+
+.search-container{
+  flex-direction: column;
 }
 
 #keywords-search{
   background-color: rgba(255, 255, 255, 0.548);
+  text-align: center;
   height: 40px;
   width: 220px;
   border-radius: 12px;
@@ -78,7 +85,7 @@ header {
 }
 
 .keywords-display{
-  width: 60%;
+  width: 100%;
 }
 .keywords-display span {
   cursor: pointer;
@@ -94,7 +101,7 @@ header {
 }
 
 .grid-container img {
-  width: 100%;
+  width: 90%;
   height: 278px;
   object-fit: cover;
   cursor: pointer;
@@ -111,7 +118,7 @@ header {
 
 .canvas-container {
   width: 340px;
-  height: 320px;
+  height: 330px;
 }
 
 canvas {
@@ -280,6 +287,7 @@ footer p {
     opacity: 1;
     visibility: visible;
   }
+
 }
 
 /* MEDIUM  */
@@ -293,9 +301,23 @@ footer p {
     display: none;
   }
 
+  .main-container {
+    min-height: 800px;
+  }
+
   .main-content {
     max-width: 730px;
   }
+
+  .search-container{
+    flex-direction: row;
+  }
+  .keywords-display{
+    width: 60%;
+  }
+  .grid-header{
+    padding: 25px;
+    }
 
   .canvas-container {
     width: 341px;
