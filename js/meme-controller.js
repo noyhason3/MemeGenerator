@@ -2,27 +2,33 @@
 let gElCanvas;
 let gCtx;
 let gIsSearchOn=false;
+let gIsKeywordsClicked = false;
 const gTouchEvs = ['touchstart', 'touchmove', 'touchend']
 
 function onInit() {
   _createImgs(18);
   renderGallery();
+  // addKeywords()
   loadSavedMemes();
 }
+
 
 function renderGallery() {
   if (gIsSearchOn) {var imgs = getSearchedImgs()} else {var imgs = getImgs()};
   let strHtml = `
   <div class="grid-header">
-  <div class="search-bar">
+  <div class="search-container flex justify-space-around align-center">
   <input list="keywords" id="keywords-search" onkeyup="onSearchImgs(this)" placeholder="SEARCH IMGS">
   <datalist id="keywords">
-    <option value="dogs">
-    <option value="cute">
+    <option value="happy">
     <option value="pet">
     <option value="man">
     <option value="baby">
+    <option value="sleep">
   </datalist>
+  <p class="keywords-display flex justify-space-between">
+
+  </p>
   </div>
 
   </div>
@@ -37,8 +43,42 @@ function renderGallery() {
 
   let elGrid = document.querySelector('.main-container');
   elGrid.innerHTML = strHtml;
+  if (gIsKeywordsClicked === false) addKeywords();
+  renderKeywords();
   gIsSearchOn = false;
 }
+
+function renderKeywords(){
+  let strHtml = '';
+  let keywords = document.querySelectorAll('#keywords option');
+  keywords.forEach(keyword=>{
+    let obj = getKeyWord(keyword.value);
+    strHtml+=`<span onclick="emphasizeKeyword(this)" style="font-size: ${obj.size}px">${keyword.value}</span>`
+  })
+  let keywordsDisplay = document.querySelector('.keywords-display');
+  keywordsDisplay.innerHTML = strHtml;
+}
+
+function addKeywords(){
+  let keywords = document.querySelectorAll('#keywords option');
+  keywords.forEach(keyword=>{
+    addKeyword({key : keyword.value, size: 22})
+  })
+}
+
+function emphasizeKeyword(el){
+  gIsKeywordsClicked = true;
+
+  let objKeyword = getKeyWord(el.innerText);
+  objKeyword.size += 3;
+  // let size = parseInt(getComputedStyle(el).getPropertyValue('font-size'));
+  // el.style.fontSize = size + 3+'px';
+
+  searchImgs(el.innerText);
+  gIsSearchOn = true;
+  renderGallery();
+}
+
 
 function renderDesignPage(imgId) {
   setMemeId(imgId);

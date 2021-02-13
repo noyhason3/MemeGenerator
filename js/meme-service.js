@@ -1,10 +1,11 @@
 'use strict';
 let gNextId = 1;
-let gKeywords = {
-  1: ['dogs', 'cute', 'pet', 'pets'],
+let gKeywords= [];
+let gImgsKeywords = {
+  1: ['pet'],
   2: ['trump', 'man'],
   3: ['baby', 'dog', 'sleep'],
-  4: ['cat', 'computer', 'sleep'],
+  4: ['pet', 'computer', 'sleep'],
   5: ['baby', 'succeed'],
   6: ['man'],
   7: ['baby', 'wow'],
@@ -23,6 +24,7 @@ let gKeywords = {
 let gImgs = [];
 let gSearchedImgs=[];
 let gSavedMemes = [];
+
 
 let gMeme = {
   selectedImgId: 0,
@@ -169,6 +171,16 @@ function searchImgs(keyword) {
   gSearchedImgs = searchedImgs;
 }
 
+function getKeyWord(keyword){
+  return gKeywords.find(obj=>{
+    return obj.key===keyword;
+  })
+}
+
+function addKeyword(keywordObj){
+  gKeywords.push(keywordObj);
+}
+
 function _getSelectedLine() {
   return gMeme.lines[gMeme.selectedLineIdx];
 }
@@ -181,7 +193,7 @@ function _createImg() {
   let img = {
     id: gNextId,
     url: `imgs/${gNextId}.jpg`,
-    keywords: gKeywords[gNextId],
+    keywords: gImgsKeywords[gNextId],
   };
   gNextId++;
   return img;

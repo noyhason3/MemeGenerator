@@ -76,6 +76,14 @@ header {
   border-radius: 12px;
   outline: none;
 }
+
+.keywords-display{
+  width: 60%;
+}
+.keywords-display span {
+  font-size: 22px;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 353px);
